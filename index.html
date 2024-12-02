@@ -1,0 +1,179 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="utf-8">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <meta name="description"
+          content="Random Walks with Tweedie: A Unified Framework for Diffusion Models">
+    <meta name="author" content="Chicago Y. Park,
+    Michael T. McCann,
+    Cristina Garcia-Cardona,
+    Brendt Wohlberg,
+    Ulugbek S. Kamilov">
+
+    <title>Random Walks with Tweedie: A Unified Framework for Diffusion Models</title>
+    <!-- Bootstrap core CSS -->
+    <!--link href="bootstrap.min.css" rel="stylesheet"-->
+    <link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/4.0.0/css/bootstrap.min.css"
+          integrity="sha384-Gn5384xqQ1aoWXA+058RXPxPg6fy4IWvTNh0E263XmFcJlSAwiGgFAW/dAiS6JXm" crossorigin="anonymous">
+
+    <!-- Custom styles for this template -->
+    <link href="offcanvas.css" rel="stylesheet">
+    <link rel="stylesheet" type="text/css" href="src/css/style.css">
+
+<script src="https://polyfill.io/v3/polyfill.min.js?features=es6"></script>
+<script id="MathJax-script" async src="https://cdn.jsdelivr.net/npm/mathjax@3/es5/tex-mml-chtml.js"></script>
+
+</head>
+
+<body>
+
+<div class="jumbotron jumbotron-fluid">
+    <div class="container"></div>
+    <h2>Random Walks with Tweedie: <br>A Unified Framework for Diffusion Models</h2> <h2></h2>
+    <h3></h3> 
+            <p class="abstract">Algorithmic Template for Designing Score-based Diffusion Model Algorithms</p>
+    <hr>
+    <p class="authors">
+        <a href="https://chicagopark.github.io"> Chicago Y. Park<sup>1</sup></a>,
+        <a href="https://michael-t-mccann.github.io/"> Michael T. McCann<sup>2</sup></a>,
+        <a href="https://scholar.google.com/citations?user=WIxIUC4AAAAJ&hl=en"> Cristina Garcia-Cardona<sup>3</sup></a>,<br>
+        <a href="https://brendt.wohlberg.net/"> Brendt Wohlberg<sup>3</sup></a>,
+        <a href="https://ukmlv.github.io/"> Ulugbek S. Kamilov<sup>1</sup></a> </br>
+    </p>
+    <p>
+        <a><sup>1</sup>Computational Imaging Group, Washington University in St.Louis</a></br>
+        <a><sup>2</sup>Theoretical Division, Los Alamos National Laboratory</a></br>
+        <a><sup>3</sup>Computer, Computational and Statistical Sciences Division, Los Alamos National Laboratory</a></br>
+		</br>
+
+    </p>
+
+    <div class="btn-group" role="group" aria-label="Top menu">
+        
+        <a class="btn btn-primary" href="https://arxiv.org/abs/2411.18702">Paper (arxiv)</a>
+        <a class="btn btn-primary" href="https://github.com/wustl-cig/randomwalk_diffusion">Code</a>      
+    </div>
+
+    
+</div>
+
+<div class="container">
+    <div class="section">
+
+     <div class="row align-items-center">
+		<div class="col justify-content-center text-center">
+        		<img src="./img/figures_per_scheduling.png" style="width:85%" alt="Banner">
+                <p><b>Figure 1:</b> Unconditional image generation using the proposed score-based random walk framework, which decouples training and sampling to enable flexible noise schedules, step sizes, and temperature settings.</p>
+            </div>
+        </div>
+
+       
+
+        <br>
+        <h2>Abstract</h2>
+        <hr>
+        <p>
+            We present a simple template for designing generative diffusion model algorithms based on an interpretation of diffusion sampling as a sequence of random walks. Score-based diffusion models are widely used to generate high-quality images.
+Diffusion models have also been shown to yield state-of-the-art performance in many inverse problems. While these algorithms are often surprisingly simple, the theory behind them is not, and multiple complex theoretical justifications exist in the literature. Here, we provide a simple and largely self-contained theoretical justification for score-based-diffusion models that avoids using the theory of Markov chains or reverse diffusion, instead centering the theory of random walks and Tweedie's formula. This approach leads to unified algorithmic templates for network training and sampling. In particular, these templates cleanly separate training from sampling, e.g., the noise schedule used during training need not match the one used during sampling. We show that several existing diffusion models correspond to particular choices within this template and demonstrate that other, more straightforward algorithmic choices lead to effective diffusion models. The proposed framework has the added benefit of enabling conditional sampling without any likelihood approximation.
+        </p>
+    </div>
+
+
+    <div class="section">
+        <h2> Unified Frameworks for Diffusion Model Training and Sampling</h2>
+        <hr>
+
+        <div class="row align-items-center">
+			<div class="col justify-content-center text-left">
+                <img src="img/template_table.png" style="width:100%" alt="Banner">
+                <p><b>Figure 2:</b> Proposed templates and parameter settings for common diffusion model algorithms, including the score-based generative model (SGM), variance-exploding (VE) and variance-preserving (VP) diffusion models in SDE, and the denoising diffusion probabilistic model (DDPM). The templates unify algorithmic configurations for network training (specifying the noise scale distribution \(\sigma\), the weight function \(w(\sigma)\), and the denoising network \(r_\theta\;\)), and sampling (specifying the noise level \(\sigma_k\), step size \(\tau_k\), and temperature parameter \(\mathcal{T}_k\;\)).
+    Here, \(\boldsymbol{s}_{\theta}\) is the pretrained score function, and \(\boldsymbol{\epsilon}_\theta\) is the pretrained neural network predicting the image's noise component.</p>
+            </div>
+        </div>
+    
+
+ 
+    </div>
+
+    <div class="section">
+        <h2> Random Walks Framework Compatible with Any Diffusion Model </h2>
+        <hr>
+        <div class="row align-items-center">
+			<div class="col justify-content-center text-left">
+                <img src="img/randomwalks_with_any_score.png" style="width:100%" alt="Banner">
+                <p> <b>Figure 3:</b> Uncondtional image generation with VP and VE-score-based sequence of random walks. This figure illustrates the flexibility of our sequence of random walks framework, which enables unconditional sampling with the VE score while also being compatible with the VP score under a unified framework. This implies that our framework can use any type of score without restricting the score training scheme.
+ </i> </p>
+            </div>
+        </div>
+
+
+    </div>
+
+    <div class="section">
+        <h2> Random Walks Framework for Solving Inverse Problems </h2>
+        <hr>
+        <div class="row align-items-center">
+			<div class="col justify-content-center text-left">
+                <img src="img/inv_problems_sigmoid_abstract.png" style="width:100%" alt="Banner">
+                <p> <b>Figure 3:</b> Conditional image sampling results with the score-based sequence of random walks with sigmoid noise scheduling. We conditionally sample four images under the same setup. This figure demonstrates that our simplified framework extends beyond unconditional image synthesis to effectively solve inverse problems.
+ </i> </p>
+            </div>
+        </div>
+
+
+
+
+
+    </div>
+    
+    <div class="section">
+        <h2>Paper</h2>
+        <hr>
+        <div>
+            <div class="list-group">
+                <a href="https://arxiv.org/abs/2411.18702"
+                   class="list-group-item">
+                    <img src="img/paper_thumbnail.png" style="width:100%; margin-right:-20px; margin-top:-10px;">
+                </a>
+            </div>
+        </div>
+    </div>
+
+    <div class="section">
+        <h2>Bibtex</h2>
+        <hr>
+        <div class="bibtexsection">
+	@article{park2024randomwalks,
+	  title={Random Walks with Tweedie: A Unified Framework for Diffusion Models},
+	  author={Park, Chicago Y.
+		and McCann, Michael T.
+		and Garcia-Cardona, Cristina
+		and Wohlberg, Brendt
+		and Kamilov, Ulugbek S.},
+	  journal={arXiv preprint arXiv:2411.18702},
+	  year={2024}
+	}        </div>
+    </div>
+
+    <hr>
+
+   <footer>
+       <p>Acknoledgement: Web template from <a href="https://www.vincentsitzmann.com/siren/">SIREN</a></p>
+   </footer>
+</div>
+
+
+<script src="https://code.jquery.com/jquery-3.5.1.slim.min.js"
+        integrity="sha384-DfXdz2htPH0lsSSs5nCTpuj/zy4C+OGpamoFVy38MVBnE+IbbVYUew+OrCXaRkfj"
+        crossorigin="anonymous"></script>
+<script src="https://cdn.jsdelivr.net/npm/popper.js@1.16.0/dist/umd/popper.min.js"
+        integrity="sha384-Q6E9RHvbIyZFJoft+2mJbHaEWldlvI9IOYy5n3zV9zzTtmI3UksdQRVvoxMfooAo"
+        crossorigin="anonymous"></script>
+<script src="https://stackpath.bootstrapcdn.com/bootstrap/4.5.0/js/bootstrap.min.js"
+        integrity="sha384-OgVRvuATP1z7JjHLkuOU7Xw704+h835Lr+6QL9UvYjZE3Ipu6Tp75j7Bh/kR0JKI"
+        crossorigin="anonymous"></script>
+
+</body>
+</html>
