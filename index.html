@@ -12,7 +12,7 @@
     Brendt Wohlberg,
     Ulugbek S. Kamilov">
 
-    <title>Random Walks with Tweedie: A Unified Framework for Diffusion Models</title>
+    <title>Random Walks with Tweedie: A Unified View of Score-Based Diffusion Models</title>
     <!-- Bootstrap core CSS -->
     <!--link href="bootstrap.min.css" rel="stylesheet"-->
     <link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/4.0.0/css/bootstrap.min.css"
@@ -31,9 +31,9 @@
 
 <div class="jumbotron jumbotron-fluid">
     <div class="container"></div>
-    <h2>Random Walks with Tweedie: <br>A Unified Framework for Diffusion Models</h2> <h2></h2>
+    <h2>Random Walks with Tweedie: <br>A Unified View of Score-Based Diffusion Models</h2> <h2></h2>
     <h3></h3> 
-            <p class="abstract">Random Walks-Based Score-based Diffusion Model Framework</p>
+            <p class="abstract"><b>IEEE Signal Processing Magazine Feature on Score-Based Diffusion Models</b></p>
     <hr>
     <p class="authors">
         <a href="https://chicagopark.github.io"> Chicago Y. Park<sup>1</sup></a>,
@@ -59,37 +59,151 @@
     
 </div>
 
+
+
+       
+
 <div class="container">
     <div class="section">
 
      <div class="row align-items-center">
 		<div class="col justify-content-center text-center">
-        		<img src="./img/figures_per_scheduling.png" style="width:85%" alt="Banner">
-                <p><b>Figure 1:</b> Unconditional image generation using the proposed score-based random walk framework, which decouples training and sampling to enable flexible noise schedules, step sizes, and temperature settings.</p>
+        		<img src="./img/spm_logo.png" style="width:100%" alt="Banner">
             </div>
         </div>
-
-       
 
         <br>
         <h2>Abstract</h2>
         <hr>
         <p>
-            We present a simple template for designing generative diffusion model algorithms based on an interpretation of diffusion sampling as a sequence of random walks. Score-based diffusion models are widely used to generate high-quality images.
-Diffusion models have also been shown to yield state-of-the-art performance in many inverse problems. While these algorithms are often surprisingly simple, the theory behind them is not, and multiple complex theoretical justifications exist in the literature. Here, we provide a simple and largely self-contained theoretical justification for score-based-diffusion models that avoids using the theory of Markov chains or reverse diffusion, instead centering the theory of random walks and Tweedie's formula. This approach leads to unified algorithmic templates for network training and sampling. In particular, these templates cleanly separate training from sampling, e.g., the noise schedule used during training need not match the one used during sampling. We show that several existing diffusion models correspond to particular choices within this template and demonstrate that other, more straightforward algorithmic choices lead to effective diffusion models. The proposed framework has the added benefit of enabling conditional sampling without any likelihood approximation.
+            We present a concise derivation for several influential score-based diffusion models
+that relies on only a few textbook results.
+Diffusion models have recently emerged as powerful tools for generating realistic, synthetic signals --- particularly natural images --- and often play a role in state-of-the-art algorithms for inverse problems in image processing.
+While these algorithms are often surprisingly simple,
+the theory behind them is not,
+and multiple complex theoretical justifications exist in the literature.
+Here,
+we provide a simple and largely self-contained theoretical justification
+for score-based diffusion models that is targeted towards the signal processing community.
+This approach leads to generic algorithmic templates for training and generating samples with diffusion models.
+We show that several influential diffusion models correspond to particular choices within these templates and demonstrate that alternative, more straightforward algorithmic choices can provide comparable results.
+This approach has the added benefit of enabling conditional sampling without any likelihood approximation.
         </p>
     </div>
 
+<div class="section">
+    <h2>Essential Theories in Score-Based Diffusion Models</h2>
+    <hr>
+
+    <p><b>1. MMSE Denoiser and Neural Approximation</b></p>
+    <p>
+        A well-trained denoiser \( \mathsf{D}_{\theta} \), optimized to minimize MSE between noisy and clean images,
+        approximates the MMSE estimator. The MMSE estimator minimizes the expected squared error:
+    </p>
+    <div class="math-display">
+        \[ \hat{\mathbf{x}}_{\text{MMSE}}(\mathbf{x}_{\sigma}) = \mathbb{E}[\mathbf{X} \mid \mathbf{X}_\sigma = \mathbf{x}_{\sigma}] \]
+    </div>
+    <p>
+        and the optimal denoiser trained with MSE loss converges to this form as the number of training samples increases.
+    </p>
+
+
+    <p><b>2. Connection Between Denoiser and Tweedie’s Formula</b></p>
+    <p>
+        Tweedie’s formula links the score function of the noisy distribution \( f_{\mathbf{X}_\sigma} \) to the MMSE denoiser:
+    </p>
+    <div class="math-display">
+        \[
+        \nabla \log f_{\mathbf{X}_\sigma}(\mathbf{x}_{\sigma}) \approx \frac{\mathsf{D}_{\theta}(\mathbf{x}_{\sigma}) - \mathbf{x}_{\sigma}}{\sigma^2}
+        \]
+    </div>
+    <p>
+        This makes it possible to compute the score function from a learned denoiser, bridging denoising and score-based generative modeling.
+    </p>
+
+    <p><b>3. Sampling with Score Using Random Walks</b></p>
+    <p>
+        Langevin dynamics provide a way to sample from a distribution using only its score function. The discretized update rule is:
+    </p>
+    <div class="math-display">
+        \[
+        \mathbf{x}_{k+1} = \mathbf{x}_k + \tau_k \nabla \log f_{\mathbf{X}_{\sigma_k}}(\mathbf{x}_k) + \sqrt{2\tau_k \mathcal{T}_k} \, \mathbf{n}
+        \]
+    </div>
+<p>
+    This defines a random walk guided by the score function, with step size \( \tau_k \) and temperature \( \mathcal{T}_k \).
+    By choosing these parameters appropriately, many popular sampling algorithms such as NCSN [1], DDPM [2], and Score-SDE [3] can be recovered as special cases (see Table 1 for specific parameter choices).
+    Beyond replicating these algorithms, our paper demonstrates that even straightforward choices of these configurable parameters can yield high-quality samples—without strictly adhering to algorithm-specific sampling rules.
+    This highlights that diffusion sampling is more flexible than often assumed and, at its core, can be interpreted as a form of stochastic gradient ascent.
+</p>
+
+
+
+    <p><b>4. Cross-Compatible Use of Different Types of Score within Random Walks</b></p>
+    <p>
+        The noise perturbation used in score-based models follows either a variance-exploding (VE) or variance-preserving (VP) formulation.
+        In the VE case (e.g., NCSN), noise is added as:
+    </p>
+    <div class="math-display">
+        \[ \mathbf{x}^{\text{VE}}_t = \mathbf{x} + \sigma_t \mathbf{n} \]
+    </div>
+    <p>
+        while in the VP case (e.g., DDPM), the perturbation is:
+    </p>
+    <div class="math-display">
+        \[ \mathbf{x}^{\text{VP}}_t = \sqrt{\bar{\alpha}_t} \left( \mathbf{x} + \sqrt{\tfrac{1 - \bar{\alpha}_t}{\bar{\alpha}_t}} \mathbf{n} \right) \]
+    </div>
+    <p>
+        These perturbations lead to different score functions, but they can be related by a unified form:
+    </p>
+    <div class="math-display">
+        \[
+        \nabla \log f_{\mathbf{X}_{\sigma}}(\mathbf{x})
+        = \nabla \log f_{\mathbf{X}^{\text{VE}}_t}(\mathbf{x})
+        = \sqrt{\bar{\alpha}_t} \nabla \log f_{\mathbf{X}^{\text{VP}}_t}(\sqrt{\bar{\alpha}_t} \, \mathbf{x})
+        \]
+    </div>
+<p>
+    This compatibility enables the use of pretrained VE and VP models within a single random walk framework, enhancing the generality of our approach.
+    As illustrated in Figure 2, samples generated using VE or VP scores remain visually consistent—even without using sampling algorithms specifically tailored to each case. This highlights the flexibility of our formulation and the robustness of its unified design.
+</p>
+
+
+<p><b>5. Solving Inverse Problems with Learned Score-based Diffusion Priors</b></p>
+<p>
+    In inverse problems, the goal is to recover an unknown signal \( \mathbf{x} \in \mathbb{R}^d \) from degraded measurements \( \mathbf{y} = \mathbf{A} \mathbf{x} + \mathbf{e} \), where \( \mathbf{A} \) is a known forward operator and \( \mathbf{e} \sim \mathcal{N}(0, \eta^2 \mathbf{I}) \) models Gaussian noise.
+    A principled solution is to sample from the posterior distribution \( f_{\mathbf{X} \mid \mathbf{Y}}(\mathbf{x} \mid \mathbf{y}) \propto f_{\mathbf{Y} \mid \mathbf{X}}(\mathbf{y} \mid \mathbf{x}) f_{\mathbf{X}}(\mathbf{x}) \), combining a learned prior with a known likelihood.
+</p>
+<p>
+    While many existing methods approximate the intractable gradient \( \nabla \log f_{\mathbf{Y} \mid \mathbf{X}_{\sigma_k}}(\mathbf{y} \mid \mathbf{x}_k) \), our framework bypasses this step by directly incorporating the known likelihood gradient \( \nabla \log f_{\mathbf{Y} \mid \mathbf{X}}(\mathbf{y} \mid \mathbf{x}) \).
+    This yields a simple yet effective update rule:
+</p>
+<div class="math-display">
+\[
+\mathbf{x}_{k+1} = \mathbf{x}_k + \tau_k \nabla \log f_{\mathbf{X}_{\sigma_k}}(\mathbf{x}_k) + \frac{\tau_k}{\eta^2} \mathbf{A}^T ( \mathbf{y} - \mathbf{A} \mathbf{x}_k ) + \sqrt{2\tau_k \mathcal{T}_k} \, \mathbf{n}
+\]
+
+</div>
+<p>
+    As the noise level \( \sigma_k \to 0 \), the update rule asymptotically recovers the posterior score \( \nabla \log f_{\mathbf{X} \mid \mathbf{Y}}(\mathbf{x}) \), enabling direct posterior sampling.
+</p>
+
+
+</div>
+
+
+
+
 
     <div class="section">
-        <h2> Unified Frameworks for Diffusion Model Training and Sampling</h2>
+		<h2>Popular Sampling Algorithms as Parameterized Random Walks</h2>
         <hr>
 
         <div class="row align-items-center">
 			<div class="col justify-content-center text-left">
                 <img src="img/template_table.png" style="width:100%" alt="Banner">
-                <p><b>Figure 2:</b> Proposed templates and parameter settings for common diffusion model algorithms, including the score-based generative model (SGM), variance-exploding (VE) and variance-preserving (VP) diffusion models in SDE, and the denoising diffusion probabilistic model (DDPM). The templates unify algorithmic configurations for network training (specifying the noise scale distribution \(\sigma\), the weight function \(w(\sigma)\), and the denoising network \(r_\theta\;\)), and sampling (specifying the noise level \(\sigma_k\), step size \(\tau_k\), and temperature parameter \(\mathcal{T}_k\;\)).
-    Here, \(\boldsymbol{s}_{\theta}\) is the pretrained score function, and \(\boldsymbol{\epsilon}_\theta\) is the pretrained neural network predicting the image's noise component.</p>
+                <p><b>Table 1:</b> Proposed templates and parameter settings for common diffusion model algorithms, including the noise conditional score network (NCSN), the denoising diffusion probabilistic model (DDPM), and variance-exploding (VE) and variance-preserving (VP) diffusion models in SDE. The templates unify algorithmic configurations for sampling (specifying the noise level \(\sigma_k\), step size \(\tau_k\), and temperature parameter \(\mathcal{T}_k\;\)).
+</p>
             </div>
         </div>
     
@@ -98,12 +212,12 @@ Diffusion models have also been shown to yield state-of-the-art performance in m
     </div>
 
     <div class="section">
-        <h2> Random Walks Framework Compatible with Any Diffusion Model </h2>
+        <h2>Random Walks Can Use Any Type of Score Functions</h2>
         <hr>
         <div class="row align-items-center">
 			<div class="col justify-content-center text-left">
                 <img src="img/randomwalks_with_any_score.png" style="width:100%" alt="Banner">
-                <p> <b>Figure 3:</b> Uncondtional image generation with VP and VE-score-based sequence of random walks. This figure illustrates the flexibility of our sequence of random walks framework, which enables unconditional sampling with the VE score while also being compatible with the VP score under a unified framework. This implies that our framework can use any type of score without restricting the score training scheme.
+                <p> <b>Figure 2:</b> Unconditional image generation with VP and VE-score-based sequence of random walks. This figure illustrates the flexibility of our sequence of random walks framework, which enables unconditional sampling with the VE score while also being compatible with the VP score under a unified framework. This implies that our framework can use any type of score without restricting the score training scheme.
  </i> </p>
             </div>
         </div>
@@ -112,7 +226,18 @@ Diffusion models have also been shown to yield state-of-the-art performance in m
     </div>
 
     <div class="section">
-        <h2> Random Walks Framework for Solving Inverse Problems </h2>
+        <h2>Random Walks Can Use Arbitrary Noise Level Schedule</h2>
+        <hr>
+
+     <div class="row align-items-center">
+		<div class="col justify-content-center text-left">
+                        		<img src="./img/figures_per_scheduling.png" style="width:100%" alt="Banner">
+                <p><b>Figure 1:</b> Unconditional image generation using the proposed score-based random walk framework, which decouples training and sampling to enable flexible noise schedules, step sizes, and temperature settings.</p>
+            </div>
+        </div>
+
+    <div class="section">
+        <h2>Likelihood Approximation-Free Posterior Sampling with Random Walks</h2>
         <hr>
         <div class="row align-items-center">
 			<div class="col justify-content-center text-left">
@@ -123,10 +248,18 @@ Diffusion models have also been shown to yield state-of-the-art performance in m
         </div>
 
 
-
-
-
     </div>
+<div class="section">
+    <h4>References</h4>
+    <ol>
+		<li>Y. Song and S. Ermon, “Generative modeling by estimating gradients of the data distribution,” in Advances in Neural Information Processing Systems, vol. 32, 2019.</li>
+        <li>J. Ho, A. Jain, and P. Abbeel, “Denoising diffusion probabilistic models,” in Advances in Neural Information Processing
+Systems, vol. 33, 2020, pp. 6840–6851.</li>
+        <li>Y. Song, J. Sohl-Dickstein, D. P. Kingma, A. Kumar, S. Ermon, and B. Poole, “Score-based generative modeling through
+stochastic differential equations,” in 9th International Conference on Learning Representations (ICLR), 2021.</li>
+    </ol>
+</div>
+
     
     <div class="section">
         <h2>Paper</h2>
@@ -145,22 +278,22 @@ Diffusion models have also been shown to yield state-of-the-art performance in m
         <h2>Bibtex</h2>
         <hr>
         <div class="bibtexsection">
-	@article{park2024randomwalks,
-	  title={Random Walks with Tweedie: A Unified Framework for Diffusion Models},
+	@article{park2025randomwalks,
+	  title={Random Walks with Tweedie: A Unified View of Score-Based Diffusion Models},
 	  author={Park, Chicago Y.
 		and McCann, Michael T.
 		and Garcia-Cardona, Cristina
 		and Wohlberg, Brendt
 		and Kamilov, Ulugbek S.},
-	  journal={arXiv preprint arXiv:2411.18702},
-	  year={2024}
+	  journal={IEEE Signal Processing Magazine},
+	  year={2025}
 	}        </div>
     </div>
 
     <hr>
 
    <footer>
-       <p>Acknoledgement: Web template from <a href="https://www.vincentsitzmann.com/siren/">SIREN </a></p>
+       <p>Acknoledgement: Web template from <a href="https://www.vincentsitzmann.com/siren/">SIREN</a></p>
    </footer>
 </div>
 
