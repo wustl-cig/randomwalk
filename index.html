@@ -95,22 +95,23 @@ This approach has the added benefit of enabling conditional sampling without any
     <h2>Essential Theories in Score-Based Diffusion Models</h2>
     <hr>
 
-    <p><b>1. MMSE Denoiser and Approximation via Deep Denoiser</b></p>
+    <p><b>1. MMSE Denoiser and Its Approximation via Deep Denoiser</b></p>
     <p>
-        A well-trained denoiser \( \mathsf{D}_{\theta} \), optimized to minimize MSE between noisy and clean images,
-        approximates the MMSE estimator. The MMSE estimator minimizes the expected squared error:
+		Let \( \mathbf{X} \in \mathbb{R}^d \) be a clean signal and \( \mathbf{X}_\sigma = \mathbf{X} + \sigma \mathbf{n} \) be its noisy observation with Gaussian noise \( \mathbf{n} \sim \mathcal{N}(\mathbf{0}, \mathbf{I}) \).
+    The minimum mean squared error (MMSE) estimator is defined as the conditional expectation:
     </p>
     <div class="math-display">
         \[ \hat{\mathbf{x}}_{\text{MMSE}}(\mathbf{x}_{\sigma}) = \mathbb{E}[\mathbf{X} \mid \mathbf{X}_\sigma = \mathbf{x}_{\sigma}] \]
     </div>
-    <p>
-        and the optimal denoiser trained with MSE loss converges to this form as the number of training samples increases.
-    </p>
+	<p>
+	    A deep denoiser \( \mathsf{D}_{\theta} \), trained to minimize the mean squared error (MSE) between its output and the corresponding clean sample, approximates this MMSE estimator.
+	    As the training dataset grows, the denoiser converges to the optimal MMSE solution.
+	</p>
 
 
     <p><b>2. Connection Between Denoiser and Tweedie’s Formula</b></p>
     <p>
-        Tweedie’s formula links the score function of the noisy distribution \( f_{\mathbf{X}_\sigma} \) to the MMSE denoiser:
+        Tweedie’s formula establishes a connection between the score function of the noisy distribution \( f_{\mathbf{X}_\sigma} \) and the MMSE denoiser. Specifically, under Gaussian noise corruption, the score can be approximated as:
     </p>
     <div class="math-display">
         \[
@@ -118,7 +119,7 @@ This approach has the added benefit of enabling conditional sampling without any
         \]
     </div>
     <p>
-        This makes it possible to compute the score function from a learned denoiser, bridging denoising and score-based generative modeling.
+        This identity enables the use of a learned denoiser to estimate the score function, providing a practical bridge between supervised denoising and score-based generative modeling.
     </p>
 
     <p><b>3. Sampling with Score Using Random Walks</b></p>
